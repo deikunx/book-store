@@ -1,25 +1,20 @@
 package com.bookstore;
 
-import org.springframework.boot.CommandLineRunner;
+import com.bookstore.model.Book;
+import java.math.BigDecimal;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class BookStoreApplication {
 
     public static void main(String[] args) {
+        Book book = new Book();
+        book.setIsbn("ww");
+        book.setPrice(BigDecimal.TEN);
+        book.setAuthor("Geroge");
+        book.setTitle("1984");
         SpringApplication.run(BookStoreApplication.class, args);
-    }
-
-    @Bean
-    CommandLineRunner commandLineRunner() {
-        return new CommandLineRunner() {
-            @Override
-            public void run(String... args) throws Exception {
-
-            }
-        };
     }
 
 }
