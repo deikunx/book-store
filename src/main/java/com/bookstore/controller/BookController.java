@@ -19,17 +19,17 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping()
-    List<BookDto> findAll() {
+    public List<BookDto> findAll() {
         return bookService.findAll();
     }
 
     @PostMapping
-    BookDto save(@RequestBody CreateBookRequestDto bookRequestDto) {
+    public BookDto save(@RequestBody CreateBookRequestDto bookRequestDto) {
         return bookService.save(bookRequestDto);
     }
 
     @GetMapping("/{id}")
-    BookDto findById(@PathVariable Long id) {
+    public BookDto findById(@PathVariable Long id) {
         return bookService.findById(id);
     }
 }
