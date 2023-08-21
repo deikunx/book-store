@@ -24,7 +24,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 @Entity
 @SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
@@ -58,6 +57,7 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @ToString.Exclude
     private Set<Role> roles;
 
     @Override

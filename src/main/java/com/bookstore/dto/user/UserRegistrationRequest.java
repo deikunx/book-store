@@ -1,10 +1,16 @@
 package com.bookstore.dto.user;
 
+import com.bookstore.validation.FieldMatch;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
+@FieldMatch.List({
+        @FieldMatch(first = "password",
+                second = "repeatPassword",
+                message = "Passwords do not match")
+})
 public class UserRegistrationRequest {
     @NotBlank
     @Size(min = 4, max = 50)
