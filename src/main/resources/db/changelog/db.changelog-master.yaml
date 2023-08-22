@@ -5,3 +5,19 @@ databaseChangeLog:
       file: db/changelog/changes/02-change-cover-image-column-name.yaml
   - include:
       file: db/changelog/changes/03-add-is-deleted-column-to-books-table.yaml
+  - include:
+      file: db/changelog/changes/04-create-users-table.yaml
+  - include:
+      file: db/changelog/changes/05-create-roles-table.yaml
+  - include:
+      file: db/changelog/changes/06-create-users-roles-table.yaml
+  - include:
+      file: db/changelog/changes/07-add-is-deleted-column-to-users-table.yaml
+  - include:
+      file: db/changelog/changes/08-insert-roles-into-roles-table.yaml
+  - include:
+      file: db/changelog/changes/09-insert-admin-role-into-roles-table.yaml
+  - include:
+      file: db/changelog/changes/10-insert-roles-and-users-into-roles-users-table.yaml
+  - include:
+      file: db/changelog/changes/11-insert-roles-to-users-and-roles-table.yaml
