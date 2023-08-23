@@ -30,38 +30,38 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping()
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @Operation(summary = "Get all books", description = "Get list of available books")
     public List<BookDto> findAll(Pageable pageable) {
         return bookService.findAll(pageable);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create new book", description = "Create new book")
     public BookDto save(@RequestBody @Valid CreateBookRequestDto bookRequestDto) {
         return bookService.save(bookRequestDto);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @Operation(summary = "Get book by ID", description = "Get book by ID")
     public BookDto findById(@PathVariable Long id) {
         return bookService.findById(id);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete book", description = "Create new book")
     public void deleteById(@PathVariable Long id) {
         bookService.deleteById(id);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Update book by ID", description = "Update book by ID")
     public void updateBookById(@PathVariable Long id,
                                @RequestBody CreateBookRequestDto bookRequestDto) {
@@ -69,7 +69,7 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @Operation(summary = "Search book by multiple parameters",
             description = "Search book by multiple parameters")
     public List<BookDto> search(BookSearchParametersDto bookSearchParametersDto) {

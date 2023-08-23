@@ -6,7 +6,7 @@ import com.bookstore.exception.RegistrationException;
 import com.bookstore.mapper.UserMapper;
 import com.bookstore.model.RoleName;
 import com.bookstore.model.User;
-import com.bookstore.repository.RoleRepository;
+import com.bookstore.repository.role.RoleRepository;
 import com.bookstore.repository.user.UserRepository;
 import com.bookstore.service.UserService;
 import java.util.Set;

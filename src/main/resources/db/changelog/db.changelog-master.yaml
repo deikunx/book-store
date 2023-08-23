@@ -21,3 +21,11 @@ databaseChangeLog:
       file: db/changelog/changes/10-insert-roles-and-users-into-roles-users-table.yaml
   - include:
       file: db/changelog/changes/11-insert-roles-to-users-and-roles-table.yaml
+  - include:
+      file: db/changelog/changes/12-create-categories-table.yaml
+  - include:
+      file: db/changelog/changes/13-add-is-deleted-column-to-roles-table.yaml
+  - include:
+      file: db/changelog/changes/14-create-books-categories-table.yaml
+  - include:
+      file: db/changelog/changes/15-insert-role-to-users-and-roles-table.yaml
