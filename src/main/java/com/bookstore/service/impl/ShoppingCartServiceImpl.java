@@ -37,7 +37,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void addItemToCard(Long bookId, int quantity) {
-        User currentUser = userService.getCurrentUser().orElseThrow();
+        User currentUser = userService
+                .getCurrentUser()
+                .orElseThrow(() -> new EntityNotFoundException("Can't get current user"));
 
         Book book = bookRepository
                 .findBookById(bookId)
@@ -58,11 +60,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void deleteCartItemById(Long cartItemId) {
-        User currentUser = userService.getCurrentUser().orElseThrow();
+        User currentUser = userService
+                .getCurrentUser()
+                .orElseThrow(() -> new EntityNotFoundException("Can't get current user"));
 
         ShoppingCart shoppingCart = shoppingCartRepository
                 .findById(currentUser.getId())
-                .orElseThrow();
+                .orElseThrow(() -> new EntityNotFoundException("Can't "
+                        + "get shopping cart with id " + currentUser.getId()));
 
         CartItem cartItem = shoppingCart.getCartItems()
                 .stream()
@@ -87,11 +92,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void updateQuantity(Long cartItemId, CartItemUpdateDto cartItemUpdateDto) {
-        User currentUser = userService.getCurrentUser().orElseThrow();
+        User currentUser = userService
+                .getCurrentUser()
+                .orElseThrow(() -> new EntityNotFoundException("Can't get current user"));
 
         ShoppingCart shoppingCart = shoppingCartRepository
                 .findById(currentUser.getId())
-                .orElseThrow();
+                .orElseThrow(() -> new EntityNotFoundException("Can't "
+                        + "get shopping cart with id " + currentUser.getId()));
 
         CartItem cartItem = shoppingCart.getCartItems()
                 .stream()
