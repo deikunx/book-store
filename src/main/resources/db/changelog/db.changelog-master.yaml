@@ -29,3 +29,21 @@ databaseChangeLog:
       file: db/changelog/changes/14-create-books-categories-table.yaml
   - include:
       file: db/changelog/changes/15-insert-role-to-users-and-roles-table.yaml
+  - include:
+      file: db/changelog/changes/16-create-shopping-carts-table.yaml
+  - include:
+      file: db/changelog/changes/17-create-cart-items-table.yaml
+  - include:
+      file: db/changelog/changes/18-add-shopping-carts-to-users.yaml
+  - include:
+      file: db/changelog/changes/19-add-is-deleted-column-to-cart-items-table.yaml
+  - include:
+      file: db/changelog/changes/20-insert-is-deleted-values-to-cart-items-table.yaml
+  - include:
+      file: db/changelog/changes/21-update-is-deleted-values-in-cart-items-table.yaml
+  - include:
+      file: db/changelog/changes/22-update-is-deleted-values-in-cart-items.yaml
+  - include:
+      file: db/changelog/changes/23-change-shopping-carts-is-deleted-type.yaml
+  - include:
+      file: db/changelog/changes/24-update-is-deleted-values-in-shopping-carts-table.yaml

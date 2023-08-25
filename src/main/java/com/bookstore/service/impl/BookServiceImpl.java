@@ -8,9 +8,9 @@ import com.bookstore.exception.EntityNotFoundException;
 import com.bookstore.mapper.BookMapper;
 import com.bookstore.model.Book;
 import com.bookstore.model.Category;
-import com.bookstore.repository.CategoryRepository;
 import com.bookstore.repository.book.BookRepository;
 import com.bookstore.repository.book.BookSpecificationBuilder;
+import com.bookstore.repository.category.CategoryRepository;
 import com.bookstore.service.BookService;
 import java.util.List;
 import java.util.Set;
@@ -85,7 +85,8 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookDtoWithoutCategoryIds> findAllByCategoryId(Long categoryId) {
         return bookRepository.findAllByCategoryId(categoryId)
-                .stream().map(bookMapper::toDtoWithoutCategories)
+                .stream()
+                .map(bookMapper::toDtoWithoutCategories)
                 .toList();
     }
 }
