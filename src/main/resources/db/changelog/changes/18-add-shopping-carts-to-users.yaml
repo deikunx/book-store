@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-shopping-carts-to-users
+      author: deykunx
+      changes:
+        - insert:
+            tableName: shopping_carts
+            columns:
+              - column:
+                  name: id
+                  value: "2"
+
+
+        - insert:
+            tableName: shopping_carts
+            columns:
+              - column:
+                  name: id
+                  value: "4"

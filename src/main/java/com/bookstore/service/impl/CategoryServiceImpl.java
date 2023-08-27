@@ -4,10 +4,11 @@ import com.bookstore.dto.category.CategoryDto;
 import com.bookstore.exception.EntityNotFoundException;
 import com.bookstore.mapper.CategoryMapper;
 import com.bookstore.model.Category;
-import com.bookstore.repository.CategoryRepository;
+import com.bookstore.repository.category.CategoryRepository;
 import com.bookstore.service.CategoryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,8 +18,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public List<CategoryDto> findAll() {
-        return categoryRepository.findAll()
+    public List<CategoryDto> findAllWithPages(Pageable pageable) {
+        return categoryRepository.findAllWithPages(pageable)
                 .stream()
                 .map(categoryMapper::toDto)
                 .toList();

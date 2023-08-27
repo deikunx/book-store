@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-shopping-cart-table
+      author: deykunx
+      changes:
+        - createTable:
+            tableName: shopping_carts
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: is_deleted
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
