@@ -2,48 +2,24 @@ databaseChangeLog:
   - include: 
       file: db/changelog/changes/01-create-books-table.yaml
   - include:
-      file: db/changelog/changes/02-change-cover-image-column-name.yaml
+      file: db/changelog/changes/02-create-users-table.yaml
   - include:
-      file: db/changelog/changes/03-add-is-deleted-column-to-books-table.yaml
+      file: db/changelog/changes/03-create-roles-table.yaml
   - include:
-      file: db/changelog/changes/04-create-users-table.yaml
+      file: db/changelog/changes/04-create-users-roles-table.yaml
   - include:
-      file: db/changelog/changes/05-create-roles-table.yaml
+      file: db/changelog/changes/05-insert-roles-into-roles-table.yaml
   - include:
-      file: db/changelog/changes/06-create-users-roles-table.yaml
+      file: db/changelog/changes/06-create-categories-table.yaml
   - include:
-      file: db/changelog/changes/07-add-is-deleted-column-to-users-table.yaml
+      file: db/changelog/changes/07-create-books-categories-table.yaml
   - include:
-      file: db/changelog/changes/08-insert-roles-into-roles-table.yaml
+      file: db/changelog/changes/08-create-shopping-carts-table.yaml
   - include:
-      file: db/changelog/changes/09-insert-admin-role-into-roles-table.yaml
+      file: db/changelog/changes/09-create-cart-items-table.yaml
   - include:
-      file: db/changelog/changes/10-insert-roles-and-users-into-roles-users-table.yaml
+      file: db/changelog/changes/10-create-orders-table.yaml
   - include:
-      file: db/changelog/changes/11-insert-roles-to-users-and-roles-table.yaml
+      file: db/changelog/changes/11-create-order-items-table.yaml
   - include:
-      file: db/changelog/changes/12-create-categories-table.yaml
-  - include:
-      file: db/changelog/changes/13-add-is-deleted-column-to-roles-table.yaml
-  - include:
-      file: db/changelog/changes/14-create-books-categories-table.yaml
-  - include:
-      file: db/changelog/changes/15-insert-role-to-users-and-roles-table.yaml
-  - include:
-      file: db/changelog/changes/16-create-shopping-carts-table.yaml
-  - include:
-      file: db/changelog/changes/17-create-cart-items-table.yaml
-  - include:
-      file: db/changelog/changes/18-add-shopping-carts-to-users.yaml
-  - include:
-      file: db/changelog/changes/19-add-is-deleted-column-to-cart-items-table.yaml
-  - include:
-      file: db/changelog/changes/20-insert-is-deleted-values-to-cart-items-table.yaml
-  - include:
-      file: db/changelog/changes/21-update-is-deleted-values-in-cart-items-table.yaml
-  - include:
-      file: db/changelog/changes/22-update-is-deleted-values-in-cart-items.yaml
-  - include:
-      file: db/changelog/changes/23-change-shopping-carts-is-deleted-type.yaml
-  - include:
-      file: db/changelog/changes/24-update-is-deleted-values-in-shopping-carts-table.yaml
+      file: db/changelog/changes/12-insert-roles-to-users.yaml

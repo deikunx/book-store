@@ -7,7 +7,6 @@ import com.bookstore.service.ShoppingCartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,7 +39,7 @@ public class ShoppingCartController {
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @Operation(summary = "Get all items in cart", description = "Get list of all items "
             + "in user's cart")
-    public List<ShoppingCartDto> findAllByUser() {
+    public ShoppingCartDto findAllByUser() {
         return shoppingCartService.findAllByUser();
     }
 

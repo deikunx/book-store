@@ -1,9 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: change-shopping-carts-is-deleted-type
-      author: deykunx
-      changes:
-        - modifyDataType:
-            tableName: shopping_carts
-            columnName: is_deleted
-            newDataType: tinyint(1)

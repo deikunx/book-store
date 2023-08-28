@@ -37,10 +37,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void addItemToCard(Long bookId, int quantity) {
-        User currentUser = userService
-                .getCurrentUser()
-                .orElseThrow(() -> new EntityNotFoundException("Can't get current user"));
-
         Book book = bookRepository
                 .findBookById(bookId)
                 .orElseThrow(
@@ -49,9 +45,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         CartItem cartItem = new CartItem();
         cartItem.setBook(book);
         cartItem.setQuantity(quantity);
-        ShoppingCart shoppingCart = shoppingCartRepository
-                .findById(currentUser.getId())
-                .orElseThrow();
+        ShoppingCart shoppingCart = getShoppingCartForCurrentUser();
 
         cartItem.setShoppingCart(shoppingCart);
         shoppingCart.getCartItems().add(cartItem);
@@ -60,14 +54,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void deleteCartItemById(Long cartItemId) {
-        User currentUser = userService
-                .getCurrentUser()
-                .orElseThrow(() -> new EntityNotFoundException("Can't get current user"));
-
-        ShoppingCart shoppingCart = shoppingCartRepository
-                .findById(currentUser.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Can't "
-                        + "get shopping cart with id " + currentUser.getId()));
+        ShoppingCart shoppingCart = getShoppingCartForCurrentUser();
 
         CartItem cartItem = shoppingCart.getCartItems()
                 .stream()
@@ -80,26 +67,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public List<ShoppingCartDto> findAllByUser() {
-        User user = userService.getCurrentUser().orElseThrow();
-
-        return shoppingCartRepository
-                .findAllByUser(user)
-                .stream()
-                .map(shoppingCartMapper::toDto)
-                .toList();
+    public ShoppingCartDto findAllByUser() {
+        return shoppingCartMapper.toDto(getShoppingCartForCurrentUser());
     }
 
     @Override
     public void updateQuantity(Long cartItemId, CartItemUpdateDto cartItemUpdateDto) {
-        User currentUser = userService
-                .getCurrentUser()
-                .orElseThrow(() -> new EntityNotFoundException("Can't get current user"));
-
-        ShoppingCart shoppingCart = shoppingCartRepository
-                .findById(currentUser.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Can't "
-                        + "get shopping cart with id " + currentUser.getId()));
+        ShoppingCart shoppingCart = getShoppingCartForCurrentUser();
 
         CartItem cartItem = shoppingCart.getCartItems()
                 .stream()
@@ -111,5 +85,19 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         int newQuantity = cartItemUpdateDto.getQuantity();
         cartItem.setQuantity(newQuantity);
         cartItemRepository.save(cartItem);
+    }
+
+    private User getCurrentUser() {
+        return userService
+                .getCurrentUser()
+                .orElseThrow(() -> new EntityNotFoundException("Can't get current user"));
+    }
+
+    private ShoppingCart getShoppingCartForCurrentUser() {
+        User currentUser = getCurrentUser();
+        return shoppingCartRepository
+                .findById(currentUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Can't "
+                + "get shopping cart with id " + currentUser.getId()));
     }
 }

@@ -2,8 +2,8 @@ package com.bookstore.repository.book;
 
 import com.bookstore.dto.book.BookSearchParametersDto;
 import com.bookstore.model.Book;
-import com.bookstore.repository.SpecificationBuilder;
-import com.bookstore.repository.SpecificationProviderManager;
+import com.bookstore.repository.specification.SpecificationBuilder;
+import com.bookstore.repository.specification.SpecificationProviderManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;

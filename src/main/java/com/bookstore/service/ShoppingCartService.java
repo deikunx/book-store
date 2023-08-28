@@ -11,7 +11,7 @@ public interface ShoppingCartService {
 
     void deleteCartItemById(Long cartItemId);
 
-    List<ShoppingCartDto> findAllByUser();
+    ShoppingCartDto findAllByUser();
 
     void updateQuantity(Long cartItemId, CartItemUpdateDto cartItem);
 }
