@@ -36,7 +36,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public void addItemToCard(Long bookId, int quantity) {
+    public void addItemToCart(Long bookId, int quantity) {
         Book book = bookRepository
                 .findBookById(bookId)
                 .orElseThrow(
