@@ -1,5 +1,12 @@
 package com.bookstore.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.bookstore.dto.category.CategoryDto;
 import com.bookstore.exception.EntityNotFoundException;
 import com.bookstore.mapper.CategoryMapper;
@@ -18,11 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
@@ -39,13 +41,13 @@ class CategoryServiceTest {
     @Test
     @DisplayName("Verify findAllWithPages() method works")
     public void findAllWithPages_ShouldReturnListOfCategories() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("name")));
 
-        List<Category> categoryEntities = new ArrayList<>();
         Category category1 = new Category();
         category1.setId(1L);
         category1.setName("Category 1");
         category1.setDescription("Description 1");
+
+        List<Category> categoryEntities = new ArrayList<>();
         categoryEntities.add(category1);
 
         Category category2 = new Category();
@@ -54,11 +56,11 @@ class CategoryServiceTest {
         category2.setDescription("Description 2");
         categoryEntities.add(category2);
 
-        List<CategoryDto> expectedCategoryDtos = new ArrayList<>();
         CategoryDto categoryDto1 = new CategoryDto();
         categoryDto1.setId(1L);
         categoryDto1.setName("Category 1");
         categoryDto1.setDescription("Description 1");
+        List<CategoryDto> expectedCategoryDtos = new ArrayList<>();
         expectedCategoryDtos.add(categoryDto1);
 
         CategoryDto categoryDto2 = new CategoryDto();
@@ -67,11 +69,13 @@ class CategoryServiceTest {
         categoryDto2.setDescription("Description 2");
         expectedCategoryDtos.add(categoryDto2);
 
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("name")));
+
         when(categoryRepository.findAllWithPages(pageable)).thenReturn(categoryEntities);
         when(categoryMapper.toDto(category1)).thenReturn(categoryDto1);
         when(categoryMapper.toDto(category2)).thenReturn(categoryDto2);
 
-        List<CategoryDto> result = categoryService.findAllWithPages(pageable);
+        final List<CategoryDto> result = categoryService.findAllWithPages(pageable);
 
         verify(categoryRepository).findAllWithPages(pageable);
         verify(categoryMapper).toDto(category1);
@@ -153,7 +157,8 @@ class CategoryServiceTest {
         existingCategory.setDescription("Old Description");
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(existingCategory));
-        when(categoryRepository.save(existingCategory)).thenReturn(existingCategory); // Можно изменить на возвращение обновленной сущности
+        when(categoryRepository.save(existingCategory))
+                .thenReturn(existingCategory);
         when(categoryMapper.toDto(existingCategory)).thenReturn(categoryDto);
 
         CategoryDto result = categoryService.update(categoryId, categoryDto);
@@ -175,7 +180,8 @@ class CategoryServiceTest {
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> categoryService.update(categoryId, categoryDto));
+        assertThrows(EntityNotFoundException.class,
+                () -> categoryService.update(categoryId, categoryDto));
 
         verify(categoryRepository).findById(categoryId);
         verify(categoryMapper, never()).toDto(any());

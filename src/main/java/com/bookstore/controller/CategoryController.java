@@ -71,6 +71,7 @@ public class CategoryController {
 
     @GetMapping("/{id}/books")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get all books from category",
             description = "Get list of all books from category")
     public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(@PathVariable Long id) {

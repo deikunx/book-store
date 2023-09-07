@@ -1,5 +1,13 @@
 package com.bookstore.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.bookstore.dto.cartitem.CartItemUpdateDto;
 import com.bookstore.dto.shoppingcart.ShoppingCartDto;
 import com.bookstore.exception.EntityNotFoundException;
@@ -13,27 +21,15 @@ import com.bookstore.repository.cartitem.CartItemRepository;
 import com.bookstore.repository.shoppingcart.ShoppingCartRepository;
 import com.bookstore.service.impl.ShoppingCartServiceImpl;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import liquibase.pro.packaged.S;
-import liquibase.pro.packaged.U;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ShoppingCartServiceTest {
@@ -46,7 +42,6 @@ class ShoppingCartServiceTest {
 
     @Mock
     private UserService userService;
-
 
     @Mock
     private ShoppingCartMapper shoppingCartMapper;
@@ -78,7 +73,6 @@ class ShoppingCartServiceTest {
     @DisplayName("Verify addItemToCard() method works")
     void addItemToCard_WhenBookWasFound_ShouldAddBookToCart() {
         Long bookId = 1L;
-        int quantity = 2;
 
         User user = new User();
         user.setId(1L);
@@ -92,7 +86,7 @@ class ShoppingCartServiceTest {
         when(bookRepository.findBookById(bookId)).thenReturn(Optional.of(book));
         when(shoppingCartRepository.findById(user.getId())).thenReturn(Optional.of(shoppingCart));
 
-        shoppingCartService.addItemToCart(bookId, quantity);
+        shoppingCartService.addItemToCart(bookId, 2);
         verify(shoppingCartRepository).save(any(ShoppingCart.class));
     }
 
@@ -139,12 +133,12 @@ class ShoppingCartServiceTest {
     @DisplayName("Verify findAllByUser() method works")
     void findAllByUser_ShouldReturnShoppingCartOfCurrentUser() {
         ShoppingCart shoppingCart = new ShoppingCart();
-        ShoppingCartDto expectedDto = new ShoppingCartDto();
 
         User user = new User();
         user.setId(1L);
         shoppingCart.setId(user.getId());
 
+        ShoppingCartDto expectedDto = new ShoppingCartDto();
         when(userService.getCurrentUser()).thenReturn(Optional.of(user));
         when(shoppingCartRepository.findById(anyLong())).thenReturn(Optional.of(shoppingCart));
         when(shoppingCartMapper.toDto(shoppingCart)).thenReturn(expectedDto);
@@ -173,7 +167,8 @@ class ShoppingCartServiceTest {
         cartItemUpdateDto.setQuantity(3);
 
         when(userService.getCurrentUser()).thenReturn(Optional.of(currentUser));
-        when(shoppingCartRepository.findById(currentUser.getId())).thenReturn(Optional.of(shoppingCart));
+        when(shoppingCartRepository.findById(currentUser.getId()))
+                .thenReturn(Optional.of(shoppingCart));
 
         shoppingCartService.updateQuantity(cartItem.getId(), cartItemUpdateDto);
 

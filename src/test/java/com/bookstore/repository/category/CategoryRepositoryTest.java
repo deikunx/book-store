@@ -1,5 +1,8 @@
 package com.bookstore.repository.category;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.bookstore.model.Category;
 import java.util.List;
 import java.util.Set;
@@ -10,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)

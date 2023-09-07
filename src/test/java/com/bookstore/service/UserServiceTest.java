@@ -1,5 +1,14 @@
 package com.bookstore.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.bookstore.dto.user.UserRegistrationRequest;
 import com.bookstore.dto.user.UserResponseDto;
 import com.bookstore.exception.RegistrationException;
@@ -18,18 +27,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -60,7 +62,6 @@ class UserServiceTest {
         Role role = new Role();
         role.setName(RoleName.ROLE_USER);
 
-
         User user = new User();
         ShoppingCart shoppingCart = new ShoppingCart();
 
@@ -69,7 +70,7 @@ class UserServiceTest {
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
         when(userMapper.toUserResponse(user)).thenReturn(new UserResponseDto());
 
-        UserResponseDto response = userService.register(request);
+        final UserResponseDto response = userService.register(request);
 
         verify(userRepository).findByEmail(request.getEmail());
         verify(roleRepository).findRoleByName(RoleName.ROLE_USER);
@@ -104,7 +105,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Verify register() method throws exception when user with this email is already exist")
+    @DisplayName("Verify register() method throws exception when user with this email "
+            + "is already exist")
     public void register_WithInvalidEmail_ShouldThrowRegistrationException() {
         UserRegistrationRequest request = new UserRegistrationRequest();
         request.setEmail("test@example.com");

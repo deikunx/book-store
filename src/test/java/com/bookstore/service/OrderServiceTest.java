@@ -1,7 +1,16 @@
 package com.bookstore.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.bookstore.dto.order.OrderRequestDto;
 import com.bookstore.dto.order.OrderResponseDto;
+import com.bookstore.dto.order.OrderUpdateRequestDto;
 import com.bookstore.dto.orderitem.OrderItemResponseDto;
 import com.bookstore.exception.EntityNotFoundException;
 import com.bookstore.mapper.OrderItemMapper;
@@ -15,30 +24,22 @@ import com.bookstore.model.Status;
 import com.bookstore.model.User;
 import com.bookstore.repository.order.OrderRepository;
 import com.bookstore.repository.shoppingcart.ShoppingCartRepository;
+import com.bookstore.repository.user.UserRepository;
 import com.bookstore.service.impl.OrderServiceImpl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import liquibase.pro.packaged.B;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -58,12 +59,14 @@ class OrderServiceTest {
     private OrderMapper orderMapper;
 
     @Mock
+    private UserRepository userRepository;
+
+    @Mock
     private OrderItemMapper orderItemMapper;
 
     @Test
     @DisplayName("Verify create() method works")
     void create_SuccessfulCreate() {
-        OrderRequestDto orderRequestDto = new OrderRequestDto();
         User user = new User();
         user.setId(1L);
 
@@ -110,14 +113,27 @@ class OrderServiceTest {
 
         when(orderRepository.save(any(Order.class))).thenReturn(order);
 
-        // Act
+        OrderRequestDto orderRequestDto = new OrderRequestDto();
+
         OrderResponseDto createdOrder = orderService.create(orderRequestDto);
 
-        // Assert
         assertNotNull(createdOrder);
         assertEquals(String.valueOf(Status.PENDING), createdOrder.getStatus());
         verify(shoppingCartRepository).findById(1L);
         verify(orderRepository).save(any(Order.class));
+    }
+
+    @Test
+    public void updateOrderStatus_WithInvalidId_ThrowsException() {
+        Long orderId = 1L;
+        OrderUpdateRequestDto orderDto = new OrderUpdateRequestDto();
+        orderDto.setStatus("Updated Status");
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            orderService.updateOrderStatus(orderId, orderDto);
+        });
     }
 
     @Test
@@ -140,49 +156,55 @@ class OrderServiceTest {
     @DisplayName("Verify updateOrderStatus() method works")
     void updateOrderStatus_SuccessfulUpdate() {
         Long orderId = 1L;
-        Status status = Status.COMPLETED;
+        OrderUpdateRequestDto orderDto = new OrderUpdateRequestDto();
+        orderDto.setStatus(String.valueOf(Status.COMPLETED));
 
-        orderService.updateOrderStatus(orderId, status);
+        Order existingOrder = new Order();
+        existingOrder.setId(orderId);
+        existingOrder.setStatus(Status.PENDING);
 
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
+        when(orderMapper.toModel(orderDto)).thenReturn(existingOrder);
+        when(orderRepository.save(existingOrder)).thenReturn(existingOrder);
+        when(orderMapper.toUpdateDto(existingOrder)).thenReturn(orderDto);
 
-
-        verify(orderRepository).updateOrderByStatus(orderId, status);
+        final OrderUpdateRequestDto result = orderService.updateOrderStatus(orderId, orderDto);
+        verify(orderRepository).findById(orderId);
+        verify(orderRepository).save(existingOrder);
+        verify(orderMapper).toModel(orderDto);
+        verify(orderMapper).toUpdateDto(existingOrder);
+        assertEquals(orderDto, result);
     }
 
     @Test
     @DisplayName("Verify findAllOrderItems() method works")
     void findAllOrderItems_WithValidOrderId_ShouldReturnListOfAllOrderItems() {
-            // Arrange
-            Long orderId = 1L;
+        Long orderId = 1L;
 
-            OrderItem orderItem1 = new OrderItem();
-            orderItem1.setId(1L);
+        OrderItem orderItem1 = new OrderItem();
+        orderItem1.setId(1L);
 
-            OrderItem orderItem2 = new OrderItem();
-            orderItem2.setId(2L);
+        OrderItem orderItem2 = new OrderItem();
+        orderItem2.setId(2L);
 
-            Order order = new Order();
-            order.setId(orderId);
-            order.setOrderItems(Set.of(orderItem1, orderItem2));
+        Order order = new Order();
+        order.setId(orderId);
+        order.setOrderItems(Set.of(orderItem1, orderItem2));
 
-            OrderItemResponseDto orderItemResponseDto1 = new OrderItemResponseDto();
-            orderItemResponseDto1.setId(1L);
+        OrderItemResponseDto orderItemResponseDto1 = new OrderItemResponseDto();
+        OrderItemResponseDto orderItemResponseDto2 = new OrderItemResponseDto();
+        orderItemResponseDto1.setId(1L);
+        orderItemResponseDto2.setId(2L);
 
-            OrderItemResponseDto orderItemResponseDto2 = new OrderItemResponseDto();
-            orderItemResponseDto1.setId(2L);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(orderItemMapper.toDto(orderItem1)).thenReturn(orderItemResponseDto1);
+        when(orderItemMapper.toDto(orderItem2)).thenReturn(orderItemResponseDto2);
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderItemMapper.toDto(orderItem1)).thenReturn(orderItemResponseDto1);
-            when(orderItemMapper.toDto(orderItem2)).thenReturn(orderItemResponseDto2);
-
-            // Act
-            Set<OrderItemResponseDto> result = orderService.findAllOrderItems(orderId);
-
-            // Assert
-            assertNotNull(result);
-            assertEquals(2, result.size());
-            verify(orderRepository).findById(orderId);
-            verify(orderItemMapper, times(2)).toDto(any(OrderItem.class));
+        Set<OrderItemResponseDto> result = orderService.findAllOrderItems(orderId);
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(orderRepository).findById(orderId);
+        verify(orderItemMapper, times(2)).toDto(any(OrderItem.class));
     }
 
     @Test
@@ -204,10 +226,8 @@ class OrderServiceTest {
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
         when(orderItemMapper.toDto(orderItem)).thenReturn(new OrderItemResponseDto());
 
-        // Act
         OrderItemResponseDto result = orderService.findOrderItemById(orderId, itemId);
 
-        // Assert
         assertNotNull(result);
         verify(orderRepository).findById(orderId);
         verify(orderItemMapper).toDto(orderItem);
@@ -216,13 +236,11 @@ class OrderServiceTest {
     @Test
     @DisplayName("Verify findOrderItemById() method throws exception with invalid order id")
     void findOrderItem_WithInvalidOrderId_ShouldThrowEntityNotFoundException() {
-        // Arrange
         Long orderId = 1L;
         Long itemId = 2L;
 
         when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(EntityNotFoundException.class, () -> {
             orderService.findOrderItemById(orderId, itemId);
         });
@@ -231,9 +249,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("Verify findOrderItemById() method throws exception with invalid order item id")
     void findOrderItem_WithInvalidOrderItemId_ShouldThrowEntityNotFoundException() {
-        // Arrange
         Long orderId = 1L;
-        Long itemId = 2L;
 
         Order order = new Order();
         order.setId(orderId);
@@ -246,7 +262,7 @@ class OrderServiceTest {
 
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
 
-        // Act and Assert
+        Long itemId = 2L;
         assertThrows(EntityNotFoundException.class, () -> {
             orderService.findOrderItemById(orderId, itemId);
         });
@@ -262,5 +278,24 @@ class OrderServiceTest {
         assertThrows(EntityNotFoundException.class, () -> {
             orderService.findAllOrderItems(invalidOrderId);
         });
+    }
+
+    private User createUser(String email) {
+        User user = new User();
+        user.setFirstName("test");
+        user.setLastName("test");
+        user.setEmail(email);
+        user.setPassword("141");
+        return userRepository.save(user);
+    }
+
+    private Order createOrder(User user) {
+        Order order = new Order();
+        order.setOrderDate(LocalDateTime.now());
+        order.setShippingAddress("Test");
+        order.setStatus(Status.PENDING);
+        order.setTotal(BigDecimal.valueOf(100));
+        order.setUser(user);
+        return orderRepository.save(order);
     }
 }

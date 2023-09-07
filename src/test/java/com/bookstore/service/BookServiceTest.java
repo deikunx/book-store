@@ -1,5 +1,13 @@
 package com.bookstore.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.bookstore.dto.book.BookDto;
 import com.bookstore.dto.book.BookDtoWithoutCategoryIds;
 import com.bookstore.dto.book.BookSearchParametersDto;
@@ -12,14 +20,11 @@ import com.bookstore.repository.book.BookRepository;
 import com.bookstore.repository.book.BookSpecificationBuilder;
 import com.bookstore.repository.category.CategoryRepository;
 import com.bookstore.service.impl.BookServiceImpl;
-import jakarta.inject.Inject;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import liquibase.pro.packaged.B;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,13 +35,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
@@ -104,21 +102,17 @@ class BookServiceTest {
         when(bookRepository.save(book)).thenReturn(book);
         when(bookMapper.toDto(book)).thenReturn(bookDto);
 
-        BookDto actual = bookService.save(bookRequestDto);
-
+        final BookDto actual = bookService.save(bookRequestDto);
         verify(categoryRepository).findByIdIn(categoryIds);
         verify(bookMapper).toEntity(bookRequestDto);
         verify(bookRepository).save(book);
         verify(bookMapper).toDto(book);
-
         assertEquals(bookDto, actual);
     }
 
     @Test
     @DisplayName("Verify findAll() method works")
     public void findAll_ShouldReturnListOfBooks() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("title")));
-
         List<Book> bookEntities = new ArrayList<>();
         Book book1 = new Book();
         book1.setId(1L);
@@ -141,41 +135,41 @@ class BookServiceTest {
         bookDto2.setTitle("Book 2");
         expectedBookDtos.add(bookDto2);
 
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("title")));
+
         when(bookRepository.findAllWithCategories(pageable)).thenReturn(bookEntities);
         when(bookMapper.toDto(book1)).thenReturn(bookDto1);
         when(bookMapper.toDto(book2)).thenReturn(bookDto2);
 
-        List<BookDto> result = bookService.findAll(pageable);
-
+        final List<BookDto> result = bookService.findAll(pageable);
         verify(bookRepository).findAllWithCategories(pageable);
         verify(bookMapper).toDto(book1);
         verify(bookMapper).toDto(book2);
-
         assertEquals(expectedBookDtos, result);
     }
 
     @Test
     @DisplayName("Verify findById() method works")
     public void findBookById_WithValidId_ShouldReturnBook() {
-            Long bookId = 1L;
-            BookDto expectedBookDto = new BookDto();
-            expectedBookDto.setId(bookId);
-            expectedBookDto.setTitle("Sample Book");
+        Long bookId = 1L;
+        BookDto expectedBookDto = new BookDto();
+        expectedBookDto.setId(bookId);
+        expectedBookDto.setTitle("Sample Book");
 
-            Book bookEntity = new Book();
-            bookEntity.setId(bookId);
-            bookEntity.setTitle("Sample Book");
+        Book bookEntity = new Book();
+        bookEntity.setId(bookId);
+        bookEntity.setTitle("Sample Book");
 
-            when(bookRepository.findBookById(bookId)).thenReturn(Optional.of(bookEntity));
-            when(bookMapper.toDto(bookEntity)).thenReturn(expectedBookDto);
+        when(bookRepository.findBookById(bookId)).thenReturn(Optional.of(bookEntity));
+        when(bookMapper.toDto(bookEntity)).thenReturn(expectedBookDto);
 
-            BookDto result = bookService.findById(bookId);
+        BookDto result = bookService.findById(bookId);
 
-            verify(bookRepository).findBookById(bookId);
-            verify(bookMapper).toDto(bookEntity);
+        verify(bookRepository).findBookById(bookId);
+        verify(bookMapper).toDto(bookEntity);
 
-            assertEquals(expectedBookDto, result);
-        }
+        assertEquals(expectedBookDto, result);
+    }
 
     @Test
     @DisplayName("Verify that findBookById() method throws exception with not found book")
@@ -204,7 +198,6 @@ class BookServiceTest {
     @DisplayName("Verify updateBookById() method works")
     public void updateBookById_SuccessfulUpdate() {
         Long bookId = 1L;
-        Set<Long> categoryIds = Set.of(1L, 2L);
 
         Category category1 = new Category();
         category1.setId(1L);
@@ -213,6 +206,8 @@ class BookServiceTest {
 
         Book book = new Book();
         book.setId(bookId);
+
+        Set<Long> categoryIds = Set.of(1L, 2L);
 
         when(createBookRequestDto.getCategoryIds()).thenReturn(categoryIds);
         when(categoryRepository.findByIdIn(categoryIds)).thenReturn(Set.of(category1, category2));
@@ -240,12 +235,10 @@ class BookServiceTest {
 
         when(bookMapper.toDto(any(Book.class))).thenReturn(bookDto1, bookDto2);
 
-        List<BookDto> result = bookService.search(bookSearchParametersDto);
-
+        final List<BookDto> result = bookService.search(bookSearchParametersDto);
         verify(bookSpecificationBuilder).build(bookSearchParametersDto);
         verify(bookRepository).findAll(bookSpecification);
         verify(bookMapper, times(2)).toDto(any(Book.class));
-
         assertEquals(List.of(bookDto1, bookDto2), result);
     }
 
@@ -258,7 +251,8 @@ class BookServiceTest {
         BookDtoWithoutCategoryIds bookDto2 = new BookDtoWithoutCategoryIds();
         bookDto2.setId(2L);
 
-        when(bookRepository.findAllByCategoryId(categoryId)).thenReturn(List.of(new Book(), new Book()));
+        when(bookRepository.findAllByCategoryId(categoryId))
+                .thenReturn(List.of(new Book(), new Book()));
         when(bookMapper.toDtoWithoutCategories(any(Book.class))).thenReturn(bookDto1, bookDto2);
 
         List<BookDtoWithoutCategoryIds> result = bookService.findAllByCategoryId(categoryId);

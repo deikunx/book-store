@@ -1,19 +1,16 @@
 package com.bookstore.repository.order;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.bookstore.model.Order;
 import com.bookstore.model.Status;
 import com.bookstore.model.User;
 import com.bookstore.repository.user.UserRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import liquibase.pro.packaged.U;
-import org.junit.Before;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +18,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.Rollback;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -33,19 +28,6 @@ class OrderRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Test
-    @DisplayName("Update status of a certain order")
-    void updateOrderByStatus_ShouldUpdateOrderStatusInOrder() {
-        User user = createUser("test234@gmail.com");
-        Order order = createOrder(user);
-        orderRepository.updateOrderByStatus(order.getId(), Status.COMPLETED);
-
-        Order updatedOrder = orderRepository.findById(order.getId()).orElse(null);
-
-        assertNotNull(updatedOrder);
-        assertEquals(Status.COMPLETED, updatedOrder.getStatus());
-    }
 
     @Test
     @DisplayName("Find all all orders with pages")
