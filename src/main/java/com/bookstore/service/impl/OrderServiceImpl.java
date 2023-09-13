@@ -2,6 +2,7 @@ package com.bookstore.service.impl;
 
 import com.bookstore.dto.order.OrderRequestDto;
 import com.bookstore.dto.order.OrderResponseDto;
+import com.bookstore.dto.order.OrderUpdateRequestDto;
 import com.bookstore.dto.orderitem.OrderItemResponseDto;
 import com.bookstore.exception.EntityNotFoundException;
 import com.bookstore.mapper.OrderItemMapper;
@@ -71,8 +72,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updateOrderStatus(Long orderId, Status status) {
-        orderRepository.updateOrderByStatus(orderId, status);
+    public OrderUpdateRequestDto updateOrderStatus(Long orderId, OrderUpdateRequestDto orderDto) {
+        Order orderFromDb = orderRepository.findById(orderId).orElseThrow(
+                () -> new EntityNotFoundException("Can't find order by id " + orderId));
+        Order model = orderMapper.toModel(orderDto);
+        orderFromDb.setStatus(model.getStatus());
+        orderRepository.save(orderFromDb);
+        return orderMapper.toUpdateDto(orderFromDb);
     }
 
     @Override

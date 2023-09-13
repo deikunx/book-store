@@ -4,8 +4,10 @@ import com.bookstore.validation.FieldMatch;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(chain = true)
 @FieldMatch.List({
         @FieldMatch(first = "password",
                 second = "repeatPassword",

@@ -32,7 +32,7 @@ public class ShoppingCartController {
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @Operation(summary = "Add item to cart", description = "Add item to current user's cart")
     public void addItemToCart(@RequestBody @Valid CartItemRequestDto cartItem) {
-        shoppingCartService.addItemToCard(cartItem.getBookId(), cartItem.getQuantity());
+        shoppingCartService.addItemToCart(cartItem.getBookId(), cartItem.getQuantity());
     }
 
     @GetMapping()

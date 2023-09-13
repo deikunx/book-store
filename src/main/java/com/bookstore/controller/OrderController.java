@@ -4,7 +4,6 @@ import com.bookstore.dto.order.OrderRequestDto;
 import com.bookstore.dto.order.OrderResponseDto;
 import com.bookstore.dto.order.OrderUpdateRequestDto;
 import com.bookstore.dto.orderitem.OrderItemResponseDto;
-import com.bookstore.model.Status;
 import com.bookstore.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,10 +49,9 @@ public class OrderController {
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Update order status", description = "Update order status")
-    public void updateOrderStatus(@PathVariable Long id,
+    public OrderUpdateRequestDto updateOrderStatus(@PathVariable Long id,
                                   @RequestBody OrderUpdateRequestDto orderUpdateRequestDto) {
-        orderService.updateOrderStatus(id,
-                Status.valueOf(orderUpdateRequestDto.getStatus()));
+        return orderService.updateOrderStatus(id, orderUpdateRequestDto);
     }
 
     @GetMapping("/{orderId}/items")

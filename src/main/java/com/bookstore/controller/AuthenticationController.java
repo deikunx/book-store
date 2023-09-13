@@ -11,9 +11,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Authentication", description = "Endpoints for authentication")
@@ -26,6 +28,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @Operation(summary = "Registration", description = "Register new user")
+    @ResponseStatus(HttpStatus.OK)
     public UserResponseDto register(@RequestBody @Valid UserRegistrationRequest
                                                 userRegistrationRequest)
             throws RegistrationException {
@@ -34,6 +37,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @Operation(summary = "Login", description = "Login with email and password")
+    @ResponseStatus(HttpStatus.OK)
     public UserLoginResponseDto login(@RequestBody UserLoginRequestDto request) {
         return authenticationService.authenticate(request);
     }

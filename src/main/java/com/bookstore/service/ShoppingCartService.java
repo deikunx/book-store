@@ -7,7 +7,7 @@ import java.util.List;
 public interface ShoppingCartService {
     List<ShoppingCartDto> findAll();
 
-    void addItemToCard(Long bookId, int quantity);
+    void addItemToCart(Long bookId, int quantity);
 
     void deleteCartItemById(Long cartItemId);
 

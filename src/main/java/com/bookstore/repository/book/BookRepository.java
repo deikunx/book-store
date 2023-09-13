@@ -18,5 +18,4 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
 
     @Query("SELECT b FROM Book b LEFT JOIN FETCH b.categories")
     List<Book> findAllWithCategories(Pageable pageable);
-
 }
