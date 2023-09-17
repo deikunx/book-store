@@ -26,7 +26,7 @@ databaseChangeLog:
 
               - column:
                   name: total
-                  type: decimal
+                  type: decimal(38,2)
                   constraints:
                     nullable: false
               - column:
