@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.bookstore.dto.cartitem.CartItemUpdateDto;
 import com.bookstore.dto.shoppingcart.ShoppingCartDto;
 import com.bookstore.exception.EntityNotFoundException;
+import com.bookstore.mapper.CartItemMapper;
 import com.bookstore.mapper.ShoppingCartMapper;
 import com.bookstore.model.Book;
 import com.bookstore.model.CartItem;
@@ -39,6 +40,9 @@ class ShoppingCartServiceTest {
 
     @Mock
     private ShoppingCartRepository shoppingCartRepository;
+
+    @Mock
+    private CartItemMapper cartItemMapper;
 
     @Mock
     private UserService userService;
@@ -93,11 +97,6 @@ class ShoppingCartServiceTest {
     @Test
     @DisplayName("Verify addItemToCart() method throws exception when book not found")
     public void addItemToCart_WhenBookNotFound_ShouldThrowEntityNotFoundException() {
-        User currentUser = new User();
-        currentUser.setId(1L);
-
-        ShoppingCart shoppingCart = new ShoppingCart();
-
         Long nonExistentBookId = 999L;
         int quantity = 2;
 

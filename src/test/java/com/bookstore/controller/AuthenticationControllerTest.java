@@ -106,7 +106,7 @@ class AuthenticationControllerTest {
     @Sql(scripts = "classpath:db/authentication/remove-users.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Login with valid email and password should authenticate user")
-    void login() throws Exception {
+    void login_WithValidPassword_ShouldReturnOk() throws Exception {
         UserLoginRequestDto loginRequest = new UserLoginRequestDto()
                 .setEmail("johndoe@gmail.com")
                 .setPassword("123456");

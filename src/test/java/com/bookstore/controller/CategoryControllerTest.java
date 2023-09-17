@@ -52,7 +52,7 @@ class CategoryControllerTest {
     @Sql(scripts = "classpath:db/categories/remove-all-categories.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Create a new category")
-    void createCategory_WithValidRequest_ShouldCreateNewCategoryAndStatusCreated()
+    void createCategory_WithValidRequest_ShouldReturnNewCategoryAndStatusCreated()
             throws Exception {
         CategoryDto expected = new CategoryDto()
                 .setName("Test")
@@ -151,10 +151,15 @@ class CategoryControllerTest {
                 .setName("Self-development")
                 .setDescription("Self-development books");
 
-        mockMvc.perform(put("/categories/{id}", categoryId)
+        MvcResult result = mockMvc.perform(put("/categories/{id}", categoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(expected)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        CategoryDto actual = objectMapper
+                .readValue(result.getResponse().getContentAsString(), CategoryDto.class);
+        EqualsBuilder.reflectionEquals(expected, actual, "id");
     }
 
     @Test

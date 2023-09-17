@@ -49,7 +49,7 @@ public class OrderController {
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Update order status", description = "Update order status")
-    public OrderUpdateRequestDto updateOrderStatus(@PathVariable Long id,
+    public OrderResponseDto updateOrderStatus(@PathVariable Long id,
                                   @RequestBody OrderUpdateRequestDto orderUpdateRequestDto) {
         return orderService.updateOrderStatus(id, orderUpdateRequestDto);
     }

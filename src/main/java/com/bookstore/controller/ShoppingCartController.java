@@ -1,5 +1,6 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.cartitem.CartItemDto;
 import com.bookstore.dto.cartitem.CartItemRequestDto;
 import com.bookstore.dto.cartitem.CartItemUpdateDto;
 import com.bookstore.dto.shoppingcart.ShoppingCartDto;
@@ -31,8 +32,8 @@ public class ShoppingCartController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @Operation(summary = "Add item to cart", description = "Add item to current user's cart")
-    public void addItemToCart(@RequestBody @Valid CartItemRequestDto cartItem) {
-        shoppingCartService.addItemToCart(cartItem.getBookId(), cartItem.getQuantity());
+    public ShoppingCartDto addItemToCart(@RequestBody @Valid CartItemRequestDto cartItem) {
+        return shoppingCartService.addItemToCart(cartItem.getBookId(), cartItem.getQuantity());
     }
 
     @GetMapping()
@@ -56,8 +57,8 @@ public class ShoppingCartController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @Operation(summary = "Update item in cart", description = "Update item in current user's cart")
-    public void updateQuantity(@PathVariable Long cartItemId,
-                                          @RequestBody @Valid CartItemUpdateDto cartItemUpdateDto) {
-        shoppingCartService.updateQuantity(cartItemId, cartItemUpdateDto);
+    public CartItemDto updateQuantity(@PathVariable Long cartItemId,
+                                      @RequestBody @Valid CartItemUpdateDto cartItemUpdateDto) {
+        return shoppingCartService.updateQuantity(cartItemId, cartItemUpdateDto);
     }
 }

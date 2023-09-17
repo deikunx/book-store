@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -57,7 +58,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void updateBookById(Long id, CreateBookRequestDto createBookRequestDto) {
+    public BookDto updateBookById(Long id, CreateBookRequestDto createBookRequestDto) {
         Set<Category> categories = categoryRepository
                 .findByIdIn(createBookRequestDto.getCategoryIds());
         Book book = bookRepository
@@ -70,13 +71,13 @@ public class BookServiceImpl implements BookService {
         book.setCoverImage(createBookRequestDto.getCoverImage());
         book.setDescription(createBookRequestDto.getDescription());
         book.setCategories(categories);
-        bookRepository.save(book);
+        return bookMapper.toDto(bookRepository.save(book));
     }
 
     @Override
-    public List<BookDto> search(BookSearchParametersDto bookSearchParametersDto) {
-        return bookRepository
-                .findAll(bookSpecificationBuilder.build(bookSearchParametersDto))
+    public List<BookDto> search(BookSearchParametersDto params, Pageable pageable) {
+        Specification<Book> bookSpecification = bookSpecificationBuilder.build(params);
+        return bookRepository.findAll(bookSpecification, pageable)
                 .stream()
                 .map(bookMapper::toDto)
                 .toList();

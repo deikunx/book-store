@@ -67,18 +67,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponseDto> findAllOrders(Pageable pageable) {
-        return orderRepository.findAllOrders(pageable).stream()
+        return orderRepository
+                .findAllOrders(pageable)
+                .stream()
                 .map(orderMapper::toDto).toList();
     }
 
     @Override
-    public OrderUpdateRequestDto updateOrderStatus(Long orderId, OrderUpdateRequestDto orderDto) {
+    public OrderResponseDto updateOrderStatus(Long orderId, OrderUpdateRequestDto orderDto) {
         Order orderFromDb = orderRepository.findById(orderId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find order by id " + orderId));
         Order model = orderMapper.toModel(orderDto);
         orderFromDb.setStatus(model.getStatus());
         orderRepository.save(orderFromDb);
-        return orderMapper.toUpdateDto(orderFromDb);
+        return orderMapper.toDto(orderFromDb);
     }
 
     @Override
