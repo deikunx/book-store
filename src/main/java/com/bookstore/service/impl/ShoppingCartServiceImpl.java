@@ -1,8 +1,10 @@
 package com.bookstore.service.impl;
 
+import com.bookstore.dto.cartitem.CartItemDto;
 import com.bookstore.dto.cartitem.CartItemUpdateDto;
 import com.bookstore.dto.shoppingcart.ShoppingCartDto;
 import com.bookstore.exception.EntityNotFoundException;
+import com.bookstore.mapper.CartItemMapper;
 import com.bookstore.mapper.ShoppingCartMapper;
 import com.bookstore.model.Book;
 import com.bookstore.model.CartItem;
@@ -25,6 +27,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final UserService userService;
     private final ShoppingCartMapper shoppingCartMapper;
     private final CartItemRepository cartItemRepository;
+    private final CartItemMapper cartItemMapper;
 
     @Override
     public List<ShoppingCartDto> findAll() {
@@ -36,7 +39,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public void addItemToCart(Long bookId, int quantity) {
+    public ShoppingCartDto addItemToCart(Long bookId, int quantity) {
         Book book = bookRepository
                 .findBookById(bookId)
                 .orElseThrow(
@@ -49,7 +52,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         cartItem.setShoppingCart(shoppingCart);
         shoppingCart.getCartItems().add(cartItem);
-        shoppingCartRepository.save(shoppingCart);
+        return shoppingCartMapper.toDto(shoppingCartRepository.save(shoppingCart));
     }
 
     @Override
@@ -72,7 +75,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public void updateQuantity(Long cartItemId, CartItemUpdateDto cartItemUpdateDto) {
+    public CartItemDto updateQuantity(Long cartItemId, CartItemUpdateDto cartItemUpdateDto) {
         ShoppingCart shoppingCart = getShoppingCartForCurrentUser();
 
         CartItem cartItem = shoppingCart.getCartItems()
@@ -84,7 +87,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         int newQuantity = cartItemUpdateDto.getQuantity();
         cartItem.setQuantity(newQuantity);
-        cartItemRepository.save(cartItem);
+        return cartItemMapper.toDto(cartItemRepository.save(cartItem));
     }
 
     private User getCurrentUser() {

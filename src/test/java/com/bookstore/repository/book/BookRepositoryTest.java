@@ -7,6 +7,7 @@ import com.bookstore.model.Book;
 import com.bookstore.model.Category;
 import com.bookstore.repository.category.CategoryRepository;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -49,11 +50,11 @@ class BookRepositoryTest {
         book2.setIsbn("Test2");
         book2.setPrice(BigDecimal.valueOf(10));
         book2.setTitle("Test 2");
-        book2.setCategories(Set.of(category));
+        book2.setCategories(Collections.emptySet());
         bookRepository.save(book2);
 
         List<Book> books = bookRepository.findAllByCategoryId(category.getId());
-        assertEquals(2, books.size());
+        assertEquals(1, books.size());
     }
 
     @Test

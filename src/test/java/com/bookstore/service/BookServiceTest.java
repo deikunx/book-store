@@ -1,11 +1,13 @@
 package com.bookstore.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bookstore.dto.book.BookDto;
@@ -22,6 +24,7 @@ import com.bookstore.repository.category.CategoryRepository;
 import com.bookstore.service.impl.BookServiceImpl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,6 +34,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -45,19 +50,13 @@ class BookServiceTest {
     private BookMapper bookMapper;
 
     @Mock
-    private BookSpecificationBuilder bookSpecificationBuilder;
-
-    @Mock
     private CreateBookRequestDto createBookRequestDto;
 
     @Mock
-    private BookSearchParametersDto bookSearchParametersDto;
-
-    @Mock
-    private Specification<Book> bookSpecification;
-
-    @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private BookSpecificationBuilder bookSpecificationBuilder;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -124,16 +123,16 @@ class BookServiceTest {
         book2.setTitle("Book 2");
         bookEntities.add(book2);
 
-        List<BookDto> expectedBookDtos = new ArrayList<>();
+        List<BookDto> expected = new ArrayList<>();
         BookDto bookDto1 = new BookDto();
         bookDto1.setId(1L);
         bookDto1.setTitle("Book 1");
-        expectedBookDtos.add(bookDto1);
+        expected.add(bookDto1);
 
         BookDto bookDto2 = new BookDto();
         bookDto2.setId(2L);
         bookDto2.setTitle("Book 2");
-        expectedBookDtos.add(bookDto2);
+        expected.add(bookDto2);
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("title")));
 
@@ -141,34 +140,34 @@ class BookServiceTest {
         when(bookMapper.toDto(book1)).thenReturn(bookDto1);
         when(bookMapper.toDto(book2)).thenReturn(bookDto2);
 
-        final List<BookDto> result = bookService.findAll(pageable);
+        final List<BookDto> actual = bookService.findAll(pageable);
         verify(bookRepository).findAllWithCategories(pageable);
         verify(bookMapper).toDto(book1);
         verify(bookMapper).toDto(book2);
-        assertEquals(expectedBookDtos, result);
+        assertEquals(expected, actual);
     }
 
     @Test
     @DisplayName("Verify findById() method works")
     public void findBookById_WithValidId_ShouldReturnBook() {
         Long bookId = 1L;
-        BookDto expectedBookDto = new BookDto();
-        expectedBookDto.setId(bookId);
-        expectedBookDto.setTitle("Sample Book");
+        BookDto expected = new BookDto();
+        expected.setId(bookId);
+        expected.setTitle("Sample Book");
 
-        Book bookEntity = new Book();
-        bookEntity.setId(bookId);
-        bookEntity.setTitle("Sample Book");
+        Book book = new Book();
+        book.setId(bookId);
+        book.setTitle("Sample Book");
 
-        when(bookRepository.findBookById(bookId)).thenReturn(Optional.of(bookEntity));
-        when(bookMapper.toDto(bookEntity)).thenReturn(expectedBookDto);
+        when(bookRepository.findBookById(bookId)).thenReturn(Optional.of(book));
+        when(bookMapper.toDto(book)).thenReturn(expected);
 
-        BookDto result = bookService.findById(bookId);
+        BookDto actual = bookService.findById(bookId);
 
         verify(bookRepository).findBookById(bookId);
-        verify(bookMapper).toDto(bookEntity);
+        verify(bookMapper).toDto(book);
 
-        assertEquals(expectedBookDto, result);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -224,27 +223,51 @@ class BookServiceTest {
     @Test
     @DisplayName("Verify search() method works")
     public void search_ShouldReturnBooksWithCriteria() {
-        BookDto bookDto1 = new BookDto();
-        bookDto1.setId(1L);
-        BookDto bookDto2 = new BookDto();
-        bookDto2.setId(2L);
+        final String[] params = new String[0];
+        Book book = new Book();
+        book.setId(1L);
+        book.setAuthor("George Orwell");
+        book.setTitle("1984");
+        book.setIsbn("978001");
+        book.setPrice(BigDecimal.valueOf(299.99));
+        book.setDescription("Anti-utopia");
+        book.setCoverImage("1984.jpg");
+        book.setCategories(Collections.emptySet());
 
-        when(bookSpecificationBuilder.build(bookSearchParametersDto)).thenReturn(bookSpecification);
+        BookDto expected = new BookDto();
+        expected.setId(book.getId());
+        expected.setAuthor(book.getAuthor());
+        expected.setTitle(book.getTitle());
+        expected.setIsbn(book.getIsbn());
+        expected.setPrice(book.getPrice());
+        expected.setDescription(book.getDescription());
+        expected.setCoverImage(book.getCoverImage());
+        expected.setCategoryIds(Collections.emptySet());
 
-        when(bookRepository.findAll(bookSpecification)).thenReturn(List.of(new Book(), new Book()));
+        Specification<Book> spec = Specification.where(null);
+        BookSearchParametersDto bookSearchParametersDto =
+                new BookSearchParametersDto(params, params);
 
-        when(bookMapper.toDto(any(Book.class))).thenReturn(bookDto1, bookDto2);
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Book> books = List.of(book);
+        Page<Book> bookPage = new PageImpl<>(books, pageable, books.size());
 
-        final List<BookDto> result = bookService.search(bookSearchParametersDto);
-        verify(bookSpecificationBuilder).build(bookSearchParametersDto);
-        verify(bookRepository).findAll(bookSpecification);
-        verify(bookMapper, times(2)).toDto(any(Book.class));
-        assertEquals(List.of(bookDto1, bookDto2), result);
+        when(bookSpecificationBuilder.build(bookSearchParametersDto)).thenReturn(spec);
+        when(bookRepository.findAll(spec, pageable)).thenReturn(bookPage);
+        when(bookMapper.toDto(book)).thenReturn(expected);
+
+        List<BookDto> actual = bookService.search(bookSearchParametersDto, pageable);
+
+        assertThat(actual).hasSize(1);
+        assertThat(actual.get(0)).isEqualTo(expected);
+        verify(bookRepository, times(1)).findAll(spec, pageable);
+        verify(bookMapper, times(1)).toDto(book);
+        verifyNoMoreInteractions(bookRepository, bookMapper);
     }
 
     @Test
     @DisplayName("Verify findAllByCategoryId() method works")
-    public void findAllByCategoryId_ShouldReturnBooksForCategory() {
+    public void findAllByCategoryId_WithValidId_ShouldReturnBooksForCategory() {
         Long categoryId = 1L;
         BookDtoWithoutCategoryIds bookDto1 = new BookDtoWithoutCategoryIds();
         bookDto1.setId(1L);
@@ -260,6 +283,7 @@ class BookServiceTest {
         verify(bookRepository).findAllByCategoryId(categoryId);
         verify(bookMapper, times(2)).toDtoWithoutCategories(any(Book.class));
 
-        assertEquals(List.of(bookDto1, bookDto2), result);
+        List<BookDtoWithoutCategoryIds> expected = List.of(bookDto1, bookDto2);
+        assertEquals(expected, result);
     }
 }

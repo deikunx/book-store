@@ -63,16 +63,16 @@ public class BookController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Update book by ID", description = "Update book by ID")
-    public void updateBookById(@PathVariable Long id,
+    public BookDto updateBookById(@PathVariable Long id,
                                @RequestBody CreateBookRequestDto bookRequestDto) {
-        bookService.updateBookById(id, bookRequestDto);
+        return bookService.updateBookById(id, bookRequestDto);
     }
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @Operation(summary = "Search book by multiple parameters",
             description = "Search book by multiple parameters")
-    public List<BookDto> search(BookSearchParametersDto bookSearchParametersDto) {
-        return bookService.search(bookSearchParametersDto);
+    public List<BookDto> search(BookSearchParametersDto params, Pageable pageable) {
+        return bookService.search(params, pageable);
     }
 }

@@ -24,7 +24,6 @@ import com.bookstore.model.Status;
 import com.bookstore.model.User;
 import com.bookstore.repository.order.OrderRepository;
 import com.bookstore.repository.shoppingcart.ShoppingCartRepository;
-import com.bookstore.repository.user.UserRepository;
 import com.bookstore.service.impl.OrderServiceImpl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -57,9 +56,6 @@ class OrderServiceTest {
 
     @Mock
     private OrderMapper orderMapper;
-
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private OrderItemMapper orderItemMapper;
@@ -156,6 +152,7 @@ class OrderServiceTest {
     @DisplayName("Verify updateOrderStatus() method works")
     void updateOrderStatus_SuccessfulUpdate() {
         Long orderId = 1L;
+
         OrderUpdateRequestDto orderDto = new OrderUpdateRequestDto();
         orderDto.setStatus(String.valueOf(Status.COMPLETED));
 
@@ -163,17 +160,24 @@ class OrderServiceTest {
         existingOrder.setId(orderId);
         existingOrder.setStatus(Status.PENDING);
 
+        OrderResponseDto expected = new OrderResponseDto();
+        expected.setId(1L);
+        expected.setUserId(1L);
+        expected.setOrderDate(LocalDateTime.now());
+        expected.setTotal(BigDecimal.valueOf(100));
+        expected.setStatus("COMPLETED");
+
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
         when(orderMapper.toModel(orderDto)).thenReturn(existingOrder);
         when(orderRepository.save(existingOrder)).thenReturn(existingOrder);
-        when(orderMapper.toUpdateDto(existingOrder)).thenReturn(orderDto);
+        when(orderMapper.toDto(existingOrder)).thenReturn(expected);
 
-        final OrderUpdateRequestDto result = orderService.updateOrderStatus(orderId, orderDto);
+        final OrderResponseDto actual = orderService.updateOrderStatus(orderId, orderDto);
         verify(orderRepository).findById(orderId);
         verify(orderRepository).save(existingOrder);
         verify(orderMapper).toModel(orderDto);
-        verify(orderMapper).toUpdateDto(existingOrder);
-        assertEquals(orderDto, result);
+        verify(orderMapper).toDto(existingOrder);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -278,24 +282,5 @@ class OrderServiceTest {
         assertThrows(EntityNotFoundException.class, () -> {
             orderService.findAllOrderItems(invalidOrderId);
         });
-    }
-
-    private User createUser(String email) {
-        User user = new User();
-        user.setFirstName("test");
-        user.setLastName("test");
-        user.setEmail(email);
-        user.setPassword("141");
-        return userRepository.save(user);
-    }
-
-    private Order createOrder(User user) {
-        Order order = new Order();
-        order.setOrderDate(LocalDateTime.now());
-        order.setShippingAddress("Test");
-        order.setStatus(Status.PENDING);
-        order.setTotal(BigDecimal.valueOf(100));
-        order.setUser(user);
-        return orderRepository.save(order);
     }
 }
