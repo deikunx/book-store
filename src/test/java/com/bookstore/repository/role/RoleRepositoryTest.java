@@ -19,9 +19,8 @@ class RoleRepositoryTest {
     @Test
     @DisplayName("Find role by name")
     void findRoleByName_ShouldReturnRoleByName() {
-        Role role = new Role();
-        role.setName(RoleName.ROLE_USER);
-        Role expected = roleRepository.save(role);
+        Role expected = new Role();
+        expected.setName(RoleName.ROLE_USER);
 
         Role actual = roleRepository.findRoleByName(RoleName.ROLE_USER);
 
